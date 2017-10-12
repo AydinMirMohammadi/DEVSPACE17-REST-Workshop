@@ -27,7 +27,7 @@ namespace CustomerDemo.Hypermedia.Customers
         {
             this.customerRepository = customerRepository;
 
-            CreateQueryAction = new HypermediaAction<CustomerQuery>(CanNewQuery);
+            CreateQueryAction = new HypermediaAction<CustomerQuery>();
             CreateCustomerAction = new HypermediaFunction<CreateCustomerParameters, Task<Customer>>(CanCreateCustomer, DoCreateCustomer);
 
             // Add Links:
@@ -36,11 +36,6 @@ namespace CustomerDemo.Hypermedia.Customers
 
         }
 
-        // Will be called to determine if tis action is available at the moment/current state.
-        private bool CanNewQuery()
-        {
-            return true;
-        }
 
         private async Task<Customer> DoCreateCustomer(CreateCustomerParameters arg)
         {
