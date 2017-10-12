@@ -41,6 +41,59 @@ namespace CustomerDemo.Controllers.Customers
             }
         }
 
-        
+        [HttpPostHypermediaAction("MyFavoriteCustomers", typeof(HypermediaActionCustomerMarkAsFavorite))]
+        public async Task<ActionResult> MarkAsFovoriteAction([SingleParameterBinder(typeof(FavoriteCustomer))]  FavoriteCustomer favoriteCustomer)
+        {
+            try
+            {
+                var id = ExtractIdFromCustomerUri(favoriteCustomer.CustomerLink);
+
+                var customer = await customerRepository.GetEnitityByKeyAsync(id);
+                var hypermediaCustomer = new HypermediaCustomer(customer);
+                hypermediaCustomer.MarkAsFavoriteAction.Execute(favoriteCustomer);
+                return Ok();
+            }
+            catch (EntityNotFoundException)
+            {
+                return this.Problem(ProblemJsonBuilder.CreateEntityNotFound());
+            }
+            catch (InvalidLinkException e)
+            {
+                var problem = new ProblemJson()
+                {
+                    Title = $"Can not use provided object of type '{typeof(FavoriteCustomer)}'",
+                    Detail = e.Message,
+                    ProblemType = "WebApiHypermediaExtensionsCore.Hypermedia.BadActionParameter",
+                    StatusCode = 422 // Unprocessable Entity
+                };
+                return this.UnprocessableEntity(problem);
+            }
+            catch (CanNotExecuteActionException)
+            {
+                return this.CanNotExecute();
+            }
+
+        }
+
+        private int ExtractIdFromCustomerUri(string favoriteCustomerCustomerLink)
+        {
+            if (string.IsNullOrWhiteSpace(favoriteCustomerCustomerLink))
+            {
+                throw new InvalidLinkException($"Provided Link is empty '{favoriteCustomerCustomerLink}'");
+            }
+            var lastSegment = favoriteCustomerCustomerLink.Split('/').Last();
+
+            try
+            {
+                return Convert.ToInt16(lastSegment);
+
+            }
+            catch (Exception)
+            {
+                throw new InvalidLinkException($"Provided Link is invalid '{favoriteCustomerCustomerLink}', provide propper self link.");
+            }
+        }
+
+
     }
 }

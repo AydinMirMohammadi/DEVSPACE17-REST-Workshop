@@ -10,6 +10,9 @@ namespace CustomerDemo.Hypermedia.Customers
     {
         private readonly Customer customer;
 
+        [HypermediaAction(Title = "Marks a Customer as a favorite buyer.")]
+        public HypermediaActionCustomerMarkAsFavorite MarkAsFavoriteAction { get; private set; }
+
         // Hides the Property so it will not be pressent in the Hypermedia.
         [FormatterIgnoreHypermediaProperty]
         public int Id { get; set; }
@@ -33,8 +36,20 @@ namespace CustomerDemo.Hypermedia.Customers
             Age = customer.Age;
             IsFavorite = customer.IsFavorite;
             Address = customer.Address;
+
+            MarkAsFavoriteAction = new HypermediaActionCustomerMarkAsFavorite(CanMarkAsFavorite, DoMarkAsFavorite);
         }
 
-       
+        private bool CanMarkAsFavorite()
+        {
+            return !IsFavorite;
+        }
+
+        private void DoMarkAsFavorite(FavoriteCustomer favoriteCustomer)
+        {
+            customer.IsFavorite = true;
+            IsFavorite = customer.IsFavorite;
+        }
+
     }
 }
