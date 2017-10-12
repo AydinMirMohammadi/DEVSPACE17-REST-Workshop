@@ -73,7 +73,20 @@ namespace CustomerDemo.Controllers.Customers
             return this.CreatedQuery(typeof(HypermediaCustomerQueryResult), query);
         }
 
-        
-        
+        [HttpPostHypermediaAction("CreateCustomer", typeof(HypermediaFunction<CreateCustomerParameters, Task<Customer>>))]
+        public async Task<ActionResult> NewCustomerAction([SingleParameterBinder(typeof(CreateCustomerParameters))] CreateCustomerParameters createCustomerParameters)
+        {
+            if (createCustomerParameters == null)
+            {
+                return this.Problem(ProblemJsonBuilder.CreateBadParameters());
+            }
+
+            var createdCustomer = await customersRoot.CreateCustomerAction.Execute(createCustomerParameters);
+
+            // Will create a Location header with a URI to the result.
+            return this.Created(new HypermediaCustomer(createdCustomer));
+        }
+
+
     }
 }

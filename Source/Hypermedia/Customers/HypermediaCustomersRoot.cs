@@ -17,6 +17,9 @@ namespace CustomerDemo.Hypermedia.Customers
         // Add actions:
         // Each ActionType must be unique and a corresponding route must exist so the formatter can look it up.
         // See the CustomersRootController.
+        [HypermediaAction(Name = "CreateCustomer", Title = "Request creation of a new Customer.")]
+        public HypermediaFunction<CreateCustomerParameters, Task<Customer>> CreateCustomerAction { get; private set; }
+
         [HypermediaAction(Name = "CreateQuery", Title = "Query the Customers collection.")]
         public HypermediaAction<CustomerQuery> CreateQueryAction { get; private set; }
 
@@ -25,15 +28,30 @@ namespace CustomerDemo.Hypermedia.Customers
             this.customerRepository = customerRepository;
 
             CreateQueryAction = new HypermediaAction<CustomerQuery>(CanNewQuery);
+            CreateCustomerAction = new HypermediaFunction<CreateCustomerParameters, Task<Customer>>(CanCreateCustomer, DoCreateCustomer);
 
             // Add Links:
             var allQuery = new CustomerQuery();
             Links.Add(DefaultHypermediaRelations.Queries.All, new HypermediaObjectQueryReference(typeof(HypermediaCustomerQueryResult), allQuery));
-            
+
         }
 
         // Will be called to determine if tis action is available at the moment/current state.
         private bool CanNewQuery()
+        {
+            return true;
+        }
+
+        private async Task<Customer> DoCreateCustomer(CreateCustomerParameters arg)
+        {
+            var customer = CustomerService.CreateRandomCustomer();
+            customer.Name = arg.Name;
+            await customerRepository.AddEntityAsync(customer);
+
+            return customer;
+        }
+
+        private bool CanCreateCustomer()
         {
             return true;
         }
