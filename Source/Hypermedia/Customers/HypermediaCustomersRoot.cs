@@ -24,18 +24,12 @@ namespace CustomerDemo.Hypermedia.Customers
         {
             this.customerRepository = customerRepository;
 
-            CreateQueryAction = new HypermediaAction<CustomerQuery>(CanNewQuery);
+            CreateQueryAction = new HypermediaAction<CustomerQuery>();
 
             // Add Links:
             var allQuery = new CustomerQuery();
             Links.Add(DefaultHypermediaRelations.Queries.All, new HypermediaObjectQueryReference(typeof(HypermediaCustomerQueryResult), allQuery));
             
-        }
-
-        // Will be called to determine if tis action is available at the moment/current state.
-        private bool CanNewQuery()
-        {
-            return true;
         }
 
     }

@@ -11,6 +11,9 @@ namespace WebApiHypermediaExtensionsCore.Hypermedia.Actions
     {
         private readonly Action<TParameter> command;
 
+        public HypermediaAction() : base(() => true)
+        {
+        }
         public HypermediaAction(Func<bool> canExecute, Action<TParameter> command = null) : base(canExecute)
         {
             this.command = command;
