@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using CustomerDemo.Domain.Customer;
+using CustomerDemo.Hypermedia.Customers;
 using CustomerDemo.Hypermedia.EntryPoint;
 using CustomerDemo.Util.GloblaExceptionHandler;
 using Microsoft.AspNetCore.Builder;
@@ -47,6 +48,7 @@ namespace CustomerDemo
             services.AddSingleton<ICustomerRepository, CustomerRepository>();
 
             services.AddSingleton<HypermediaEntryPoint>();
+            services.AddSingleton<HypermediaCustomersRoot>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
